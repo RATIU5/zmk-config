@@ -1,3 +1,4 @@
+#include "../zmk-nodefree-config/keypos_def/keypos_adv360.h"
 /* activate bluetooth */
 #define CONFIG_WIRELESS 1
 
