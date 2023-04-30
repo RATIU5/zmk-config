@@ -75,11 +75,8 @@ ZMK_BEHAVIOR(smart_num, hold_tap,
 )
 ZMK_BEHAVIOR(num_dance, tap_dance,
     tapping-term-ms = <200>;
-    bindings = <&num_word>, <&sl 0>;  // reverse this for sticky-num on single tap
+    bindings = <&kp LSFT>, <&sl 0>;  // reverse this for sticky-num on single tap
 )
-&num_word {  // num-word, requires PR #1441
-    layers = <0>;
-};
 
 // tap: space | shift + tap: dot -> space -> sticky shift | hold: activate layer
 ZMK_BEHAVIOR(lt_spc, hold_tap,
