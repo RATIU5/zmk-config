@@ -1,12 +1,11 @@
+*This is a **legacy branch** using Zephyr 3.0 and is no longer
+maintained. See the [main branch](https://github.com/urob/zmk-config) for the latest updates.*
+
 # urob's zmk-config
 
 This is my personal [ZMK firmware](https://github.com/zmkfirmware/zmk/) configuration.
 It consists of a 34-keys base layout that is re-used for various boards, including my
 Corneish Zen and an Advantage 360 pro.
-
-This branch is updated for the latest ZMK using Zephyr 3.2. A legacy version
-compatible with Zephyr 3.0 is available
-[here](https://github.com/urob/zmk-config/tree/main-zephyr-3.0).
 
 ## Highlights
 
@@ -66,16 +65,17 @@ This is great but there are still a few rough edges:
 * When rolling keys, I sometimes unintentionally end up with "nested" key
   sequences: `key 1` down, `key 2` down and up, `key 1` up. Because of the
   `balanced` flavor, this would falsely register `key 1` as a mod. As a remedy,
-  I use ZMK's `positional hold-tap` feature to force HRMs to always resolve as
+  I use ZMK's "positional hold-tap" feature to force HRMs to always resolve as
   "tap" when the *next* key is on the same side of the keyboard. Problem
   solved.
-* ... or at least almost. By default, positional-hold-tap
+* ... or at least almost. The official ZMK version for positional-hold-taps
   performs the positional check when the next key is *pressed*. This is not
   ideal, because it prevents combining multiple modifiers on the same hand. To
-  fix this, I use the `hold-trigger-on-release` setting, which delays the
-  positional-hold-tap decision until the next key's *release*. With the setting,
+  fix this, I use a small patch that delays the positional-hold-tap decision
+  until the next key's *release* ([PR
+  #1423](https://github.com/zmkfirmware/zmk/pull/1423)). With the patch,
   multiple mods can be combined when held, while I still get the benefit from
-  positional-hold-tap when keys are tapped.
+  positional-hold-taps when keys are tapped.
 * So far, nothing of the configuration depends on the duration of
   `tapping-term-ms`. In practice, there are two reasons why I don't set it to
   infinity:
@@ -114,7 +114,7 @@ ZMK_BEHAVIOR(hml, hold_tap,
     global-quick-tap-ms = <150>;         // requires PR #1387
     bindings = <&kp>, <&kp>;
     hold-trigger-key-positions = <KEYS_R THUMBS>;
-    hold-trigger-on-release;             // delay positional check until key-release
+    hold-trigger-on-release;             // requires PR #1423
 )
 
 /* right-hand HRMs */
@@ -125,7 +125,7 @@ ZMK_BEHAVIOR(hmr, hold_tap,
     global-quick-tap-ms = <150>;         // requires PR #1387
     bindings = <&kp>, <&kp>;
     hold-trigger-key-positions = <KEYS_L THUMBS>;
-    hold-trigger-on-release;             // delay positional check until key-release
+    hold-trigger-on-release;             // requires PR #1423
 )
 ```
 
@@ -136,30 +136,11 @@ one can replace `global-quick-tap-ms = <150>` with `global-quick-tap` for a
 similar effect (`global-quick-tap` will use the regular `quick-tap-ms` timeout
 in this case).
 
-My personal [ZMK fork](https://github.com/urob/zmk) includes the
-global-quick-tap-ms PR along with a few other PRs used in my config. If you
-prefer to maintain your own fork with a custom selection of PRs, you might find
-this [ZMK-centric introduction to
+My personal [ZMK fork](https://github.com/urob/zmk) includes both the
+global-quick-tap-ms PR and the hold-trigger-on-release PR (along with a few
+other PRs). If you prefer to maintain your own fork with a custom selection of
+PRs, you might find this [ZMK-centric introduction to
 Git](https://gist.github.com/urob/68a1e206b2356a01b876ed02d3f542c7) helpful.
-
-### Troubleshooting
-
-Hopefully, the above configuration "just works". If it doesn't, here's a
-few smaller (and larger) things to try.
-
-* **False negatives (same-hand):** Reduce `tapping-term-ms` (or disable
-  `hold-trigger-key-positions`)
-* **False negatives (cross-hand):** Reduce `global-quick-tap-ms` (or set flavor
-  to `hold-preferred` -- to continue using `hold-trigger-on-release`, you must
-  also [patch
-  ZMK](https://github.com/celejewski/zmk/commit/d7a8482712d87963e59b74238667346221199293)
-  or use [an already patched branch](https://github.com/urob/zmk))
-* **False positives (same-hand):** Increase `tapping-term-ms`
-* **False positives (cross-hand):** Increase `global-quick-tap-ms` (or set
-  flavor to `tap-preferred`, which requires holding HRMs past tapping term to
-  activate)
-* **Noticeable delay when tapping HRMs:** Increase `global-quick-tap-ms`. As a rule of thumb,
-  you want to set it to at least `10500/x` where `x` is your usual WPM for English prose.[^4]
 
 
 ## Using combos instead of a symbol layer
@@ -291,16 +272,10 @@ are a few remaining issues:
   `global-quick-tap` timeout. However, with both a large tapping-term and
   positional-hold-taps, the behavior is *not* actually sensitive to the
   `global-quick-tap` timing: All it does is reduce the delay in typing; i.e., variations
-  in typing speed won't affect *what* is being typed but merely *how fast* it appears on
+  in typing speed won't affect *what* is being typed but merly *how fast* it appears on
   the screen.
 
 [^3]: The delay is determined by how quickly a key is released and is not
   directly related to the tapping-term. But regardless of its length, most
   people still find it noticable and disruptive.
 
-[^4]: E.g, if your WPM is 60 or larger, then the default of 175ms (=10500/60)
-    should work well. The rule of thumb is based on an average character length
-    of 4.7 for English words. Taking into account 1 extra tap for `space`, this
-    yields a minimum `global-quick-tap-ms` of (60 * 1000) / (5.7 * x) ≈ 10500 / x
-    milliseconds. In practice, the rule of thumb tends to be on the safe side,
-    as home row taps tend to be faster than average.
