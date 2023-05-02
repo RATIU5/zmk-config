@@ -255,7 +255,20 @@ ZMK_BEHAVIOR(tab_backtab, macro,
 		tap-ms = <5>;
 		bindings = <&kp TAB &kp TAB &sk LSHFT>;
 )
-#define TAB_NAV &tab_layer FN 0
+#define TAB_FN &tab_layer FN 0
+
+// tap: backspace | lshft + tap: delete | hold: activate layer
+ZMK_BEHAVIOR(bksp_layer, hold_tap,
+		flavor = "balanced";
+		tapping-term-ms = <200>;
+		quick-tap-ms = <QUICK_TAP_MS>;
+		bindings = <&mo>, <&bksp_morph>;
+)
+ZMK_BEHAVIOR(bksp_morph, mod_morph,
+		bindings = <&kp BSPC>, <&kp DEL>;
+		mods = <(MOD_LSFT|MOD_RSFT)>;
+)
+#define BKSP_NAV &bksp_layer NAV 0
 
 // misc aliases
 #define CANCEL      &kp K_CANCEL             // cancel caps-word, num-word and smart-mouse
@@ -275,7 +288,7 @@ ZMK_LAYER(base,
 //├──────┤ ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤ ├──────┤ ├─────────────┼─────────────┼─────────────┼─────────────┼─────────────┤ ├──────┤
     X_LB     &kp Z         &kp X         &kp C         &kp D         &kp V           X_MB     &kp K         &kp H         &comma_morph  &dot_morph    &qexcl          X_RB
 //├──────┤ ╰─────────────┼─────────────┴─────────────┼─────────────┼─────────────┤ ├──────┤ ├─────────────┼─────────────┼─────────────┴───────────────────────────╯ ├──────┤
-    X_LH                                               &lt_spc NAV 0 TAB_NAV         X_MH     RETURN_NUM    SPACESHIFT                                                X_RH
+    X_LH                                               BKSP_NAV      TAB_FN         X_MH     RETURN_NUM    SPACESHIFT                                                X_RH
 //╰──────╯                                           ╰─────────────┴─────────────╯ ╰──────╯ ╰─────────────┴─────────────╯                                           ╰──────╯
 )
 
