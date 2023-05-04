@@ -184,10 +184,10 @@ ZMK_BEHAVIOR(lt_spc, hold_tap,
     flavor = "balanced";
     tapping-term-ms = <200>;
     quick-tap-ms = <QUICK_TAP_MS>;
-    bindings = <&mo>, <&kp BSPC>;
+    bindings = <&mo>, <&spc_morph>;
 )
 ZMK_BEHAVIOR(spc_morph, mod_morph,
-    bindings = <&kp SPACE>, <&dot_spc>;
+    bindings = <&kp BSPC>, <&dot_spc>;
     mods = <(MOD_LSFT|MOD_RSFT)>;
 )
 ZMK_BEHAVIOR(dot_spc, macro,
